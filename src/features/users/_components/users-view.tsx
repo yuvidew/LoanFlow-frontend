@@ -111,11 +111,14 @@ export const UsersView = () => {
     status: statusFilter === "ALL" ? undefined : statusFilter,
   });
 
-  const { data: eligibleProductsData, isLoading: isEligibleProductsLoading } =
-    useUserEligibleProducts(
-      selectedUserId,
-      isEligibleDialogOpen && !!selectedUserId,
-    );
+  const {
+    data: eligibleProductsData,
+    isError: isEligibleProductsError,
+    isLoading: isEligibleProductsLoading,
+  } = useUserEligibleProducts(
+    selectedUserId,
+    isEligibleDialogOpen && !!selectedUserId,
+  );
 
   const users = data?.data.users ?? [];
   const totalPages = Math.max(data?.data.pagination.totalPages ?? 1, 1);
@@ -238,6 +241,10 @@ export const UsersView = () => {
             {isEligibleProductsLoading ? (
               <p className="text-sm text-muted-foreground">
                 Loading eligible products...
+              </p>
+            ) : isEligibleProductsError ? (
+              <p className="text-sm text-destructive">
+                Failed to load eligible products.
               </p>
             ) : eligibleProductsData?.data.length ? (
               eligibleProductsData.data.map((product) => (

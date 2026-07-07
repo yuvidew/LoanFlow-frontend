@@ -14,6 +14,7 @@ const apiEndPoints = {
   users: {
     get_users_list: "/users/list",
     create_user: "/users/create-user",
+    eligible_products: (userId: string) => `/users/${userId}/eligible-products`,
   },
 } as const;
 

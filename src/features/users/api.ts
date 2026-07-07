@@ -26,7 +26,7 @@ export const getEligibleProducts = async (
   userId: string
 ): Promise<EligibleProductsResponse> => {
   const response = await api.get<EligibleProductsResponse>(
-    `${apiEndPoints.users.get_users_list}/${userId}/eligible-products`
+    apiEndPoints.users.eligible_products(userId)
   );
 
   return response.data;
