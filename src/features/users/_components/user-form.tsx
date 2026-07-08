@@ -24,6 +24,8 @@ import type { User } from "@/features/users/types";
 import { useCreateUser } from "../hooks/use-users";
 import { toast } from "sonner";
 
+const MAX_MONTHLY_SALARY = 99999999.99;
+
 const userSchema = z.object({
   fullName: z.string().trim().min(2, "Name is required."),
   dateOfBirth: z.string().min(1, "Date of birth is required."),
@@ -35,7 +37,13 @@ const userSchema = z.object({
   salaryType: z.enum(["BANK_TRANSFER", "CASH", "CHEQUE"]),
   monthlySalary: z.preprocess(
     (value) => Number(value),
-    z.number().positive(),
+    z
+      .number()
+      .positive()
+      .max(
+        MAX_MONTHLY_SALARY,
+        "Monthly salary cannot exceed 99,999,999.99",
+      ),
   ),
 });
 
@@ -127,6 +135,8 @@ export const UserForm = ({
           register={register}
           error={errors.monthlySalary}
           type="number"
+          max={MAX_MONTHLY_SALARY}
+          step="0.01"
           placeholder="50000"
         />
 
