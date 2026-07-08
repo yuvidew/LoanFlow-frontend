@@ -1,9 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-
 import { FormInputField } from "@/components/common/form-input-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,12 +19,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import type { User } from "@/features/users/types";
 import { useCreateUser } from "../hooks/use-users";
-import { toast } from "sonner";
 
 const MAX_MONTHLY_SALARY = 99999999.99;
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "response" in error &&
+    typeof error.response === "object" &&
+    error.response !== null &&
+    "data" in error.response &&
+    typeof error.response.data === "object" &&
+    error.response.data !== null &&
+    "message" in error.response.data &&
+    typeof error.response.data.message === "string"
+  ) {
+    return error.response.data.message;
+  }
+
+  return fallback;
+};
 
 const userSchema = z.object({
   fullName: z.string().trim().min(2, "Name is required."),
@@ -40,10 +57,7 @@ const userSchema = z.object({
     z
       .number()
       .positive()
-      .max(
-        MAX_MONTHLY_SALARY,
-        "Monthly salary cannot exceed 99,999,999.99",
-      ),
+      .max(MAX_MONTHLY_SALARY, "Monthly salary cannot exceed 99,999,999.99"),
   ),
 });
 
@@ -68,7 +82,7 @@ export const UserForm = ({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UserFormValues>({
-    resolver: zodResolver(userSchema) as any,
+    resolver: zodResolver(userSchema),
     defaultValues: {
       fullName: defaultValues?.fullName ?? "",
       dateOfBirth: defaultValues?.dateOfBirth ?? "",
@@ -89,10 +103,8 @@ export const UserForm = ({
         toast.success("User created successfully");
         onCancel();
       },
-      onError: (error: any) => {
-        toast.error(
-          error?.response?.data?.message ?? "Failed to create user",
-        );
+      onError: (error: unknown) => {
+        toast.error(getErrorMessage(error, "Failed to create user"));
       },
     });
   };
