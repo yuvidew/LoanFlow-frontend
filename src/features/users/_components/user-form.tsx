@@ -61,7 +61,9 @@ const userSchema = z.object({
   ),
 });
 
-export type UserFormValues = z.infer<typeof userSchema>;
+type UserFormInput = z.input<typeof userSchema>;
+
+export type UserFormValues = z.output<typeof userSchema>;
 
 type UserFormProps = {
   defaultValues?: User;
@@ -81,7 +83,7 @@ export const UserForm = ({
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<UserFormValues>({
+  } = useForm<UserFormInput, unknown, UserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: {
       fullName: defaultValues?.fullName ?? "",
